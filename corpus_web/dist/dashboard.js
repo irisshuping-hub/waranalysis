@@ -96,9 +96,29 @@ function renderTable() {
   }));
 }
 
-$("sample").addEventListener("change", () => { renderChart(); renderTable(); });
+function renderKeywords() {
+  const outlet = $("keyword-outlet").value;
+  const query = $("keyword-query").value.trim().toLowerCase();
+  const matches = corpus[$("sample").value].keywords.filter(row =>
+    (!outlet || row.higher_rate === outlet) && row.word.toLowerCase().includes(query)
+  );
+  const limit = 100;
+  $("keyword-status").textContent = "Showing "+Math.min(limit,matches.length)+" of "+matches.length+" keywords.";
+  $("keyword-rows").replaceChildren(...matches.slice(0,limit).map(row => {
+    const tr = element("tr");
+    tr.append(...[row.word,row.bbc_per_10000,row.cnn_per_10000,row.bbc_files,row.cnn_files,row.higher_rate,row.G2]
+      .map(value => element("td",value)));
+    return tr;
+  }));
+}
+
+$("keyword-outlet").addEventListener("change",renderKeywords);
+$("keyword-query").addEventListener("input",renderKeywords);
+renderKeywords();
+$("sample").addEventListener("change", () => { renderChart(); renderTable(); renderKeywords(); });
 for (const id of ["node","outlet","view"]) $(id).addEventListener("change",renderTable);
 $("query").addEventListener("input",renderTable);
 renderChart();
 renderTable();
+
 

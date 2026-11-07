@@ -77,7 +77,7 @@ const {BBC,CNN}=corpora;
 for (const word of new Set([...BBC.vocab.keys(),...CNN.vocab.keys()])) {
   const b=BBC.vocab.get(word), c=CNN.vocab.get(word);
   const x=b?.count??0,y=c?.count??0;
-  if (word==="US" || x+y<8 || Math.max(b?.files.size??0,c?.files.size??0)<3) continue;
+  if (stopWords.has(word) || word==="US" || x+y<8 || Math.max(b?.files.size??0,c?.files.size??0)<3) continue;
   const e=(x+y)*BBC.total/(BBC.total+CNN.total);
   const g=2*((x?x*Math.log(x/e):0)+(y?y*Math.log(y/(x+y-e)):0));
   keywords.push([word,x,b?.files.size??0,y,c?.files.size??0,(x*10000/BBC.total).toFixed(2),(y*10000/CNN.total).toFixed(2),(x>e?"BBC":"CNN"),g.toFixed(3)]);
@@ -88,5 +88,6 @@ csv("collocations",["outlet","node","collocate","pairs","files","node_count","co
 csv("clusters",["outlet","node","length","phrase","count","files"],clusters.sort((a,b)=>b[4]-a[4]));
 csv("concordance",["outlet","file","line","node","left","match","right"],concordance);
 csv("keywords",["word","bbc_count","bbc_files","cnn_count","cnn_files","bbc_per_10000","cnn_per_10000","higher_rate","G2"],keywords.sort((a,b)=>b[8]-a[8]));
+
 
 
