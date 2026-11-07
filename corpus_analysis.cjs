@@ -2,6 +2,8 @@ const fs = require("node:fs");
 const crypto = require("node:crypto");
 const nodes = ["ukraine","russia","ukrainian","russian","ukraine's","russia's"];
 const terms = ["war","invasion","peace","ceasefire","talks","negotiations","sanctions","nato","US","uk","europe","trump","putin","zelensky","forces","troops","military","attack","attacks","strikes","aid","support","civilians","refugees","missiles","drones","nuclear","moscow","kyiv","kremlin"];
+// Exclude common function words after counting, preserving the original window and logDice denominators.
+const stopWords = new Set(`a an the and or but if while as until than that this these those which who whom whose what whatever whoever where when why how i me my mine myself we our ours ourselves you your yours yourself yourselves he him his himself she her hers herself it its itself they them their theirs themselves am is are was were be been being have has had having do does did doing can could may might must shall should will would ought to of in on at by for from with without about above below under over between into through during before after against up down out off upon not no nor neither either both each every any all some such other another same own more most less least few many much several only also just very too so then there here again once ever never already still even yet rather quite don't doesn't didn't isn't aren't wasn't weren't hasn't haven't hadn't won't wouldn't shouldn't couldn't can't cannot mustn't needn't i'm you're he's she's it's we're they're i've you've we've they've i'd you'd he'd she'd we'd they'd i'll you'll he'll she'll we'll they'll that's there's what's who's let's`.split(/\s+/));
 const sensitivity = process.argv.includes("--shorter-files");
 const out = sensitivity ? "corpus_results/shorter_files" : "corpus_results";
 fs.mkdirSync(out, {recursive:true});
@@ -63,6 +65,7 @@ for (const outlet of ["BBC","CNN"]) {
   }
   for (const [key,item] of coll) {
     const [node,word]=JSON.parse(key);
+    if (stopWords.has(word)) continue;
     const score=14+Math.log2(2*item.count/(vocab.get(node).count+vocab.get(word).count));
     collocation.push([outlet,node,word,item.count,item.files.size,vocab.get(node).count,vocab.get(word).count,score.toFixed(3)]);
   }
@@ -85,4 +88,5 @@ csv("collocations",["outlet","node","collocate","pairs","files","node_count","co
 csv("clusters",["outlet","node","length","phrase","count","files"],clusters.sort((a,b)=>b[4]-a[4]));
 csv("concordance",["outlet","file","line","node","left","match","right"],concordance);
 csv("keywords",["word","bbc_count","bbc_files","cnn_count","cnn_files","bbc_per_10000","cnn_per_10000","higher_rate","G2"],keywords.sort((a,b)=>b[8]-a[8]));
+
 

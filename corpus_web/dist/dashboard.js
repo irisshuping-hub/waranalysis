@@ -62,7 +62,7 @@ function renderTable() {
     concordance:["Outlet","Source","Context"]
   };
   const descriptions = {
-    collocations:"Ranked by logDice. Showing associations found in at least two files.",
+    collocations:"Ranked by logDice. Common function words are excluded. Showing associations found in at least two files.",
     clusters:"Ranked by count. Showing phrases found in at least two files.",
     concordance:"Source order. The selected form is highlighted."
   };
@@ -101,3 +101,4 @@ for (const id of ["node","outlet","view"]) $(id).addEventListener("change",rende
 $("query").addEventListener("input",renderTable);
 renderChart();
 renderTable();
+
